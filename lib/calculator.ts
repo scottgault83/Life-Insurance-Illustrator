@@ -1,0 +1,124 @@
+import { CalculatorInputs, CalculationRow } from './types';
+
+export function calculateInsuranceProjection(
+  inputs: CalculatorInputs,
+  years: number = 30
+): CalculationRow[] {
+  const {
+    deathBenefit,
+    rateOfReturn,
+    borrowRate,
+    outOfPocket,
+    paymentYears,
+    premiumYears,
+    annualPremium,
+    firstYearFee,
+    startAge,
+    initialExposure,
+  } = inputs;
+
+  const data: CalculationRow[] = [];
+  let prevCashValue = 0;
+  let prevEOYBal = 0;
+  let totalCostAccum = firstYearFee;
+
+  for (let year = 1; year <= years; year++) {
+    const age = startAge + year - 1;
+
+    // Premium calculation
+    const premium = year <= premiumYears ? annualPremium : 0;
+
+    // Fee (only first year)
+    const fee = year === 1 ? firstYearFee : 0;
+
+    // BOY Balance
+    const boyBal = year === 1 ? premium + fee : prevEOYBal + (year <= premiumYears ? premium : 0);
+
+    // Interest charge
+    const interestCharge = boyBal * (borrowRate / 100);
+
+    // Out of Pocket
+    const oop = year <= paymentYears ? outOfPocket : 0;
+
+    // Capitalized interest
+    const capitalizedInterest = Math.max(0, interestCharge - oop);
+
+    // EOY Balance
+    const eoyBal = boyBal + capitalizedInterest;
+
+    // Cash Value calculation
+    let cashValue;
+    if (year <= premiumYears) {
+      // Building phase - accumulate premiums with growth
+      cashValue = prevCashValue * (1 + rateOfReturn / 100) + premium;
+    } else {
+      // Growth phase after premiums stop
+      cashValue = prevCashValue * (1 + rateOfReturn / 100);
+    }
+
+    // Withdrawal (payback to lender)
+    let withdrawal = 0;
+    if (year === paymentYears && cashValue >= eoyBal) {
+      withdrawal = eoyBal;
+    }
+
+    // Adjust cash value for withdrawal
+    cashValue = cashValue - withdrawal;
+
+    // Death Benefit calculation
+    const exposureGrowth = initialExposure * Math.pow(1 + rateOfReturn / 100, year - 1);
+    const db = deathBenefit + exposureGrowth;
+
+    // Net Death Benefit
+    const netDB = db - (withdrawal > 0 ? 0 : eoyBal);
+
+    // Collateral (simplified - could be more complex)
+    const collateral = year <= paymentYears ? Math.max(0, eoyBal - cashValue * 0.9) : 0;
+
+    // Total Cost
+    totalCostAccum += oop + fee;
+
+    data.push({
+      year,
+      age,
+      premium,
+      fee,
+      withdrawal,
+      cashValue,
+      db,
+      boyBal,
+      interestCharge,
+      oop,
+      eoyBal: withdrawal > 0 ? 0 : eoyBal,
+      netDB,
+      collateral,
+      totalCost: totalCostAccum,
+    });
+
+    prevCashValue = cashValue;
+    prevEOYBal = withdrawal > 0 ? 0 : eoyBal;
+  }
+
+  return data;
+}
+
+export function getSummaryStats(data: CalculationRow[]) {
+  if (data.length === 0) {
+    return {
+      finalCashValue: 0,
+      totalOutOfPocket: 0,
+      finalNetDB: 0,
+      averageAnnualCost: 0,
+    };
+  }
+
+  const lastRow = data[data.length - 1];
+  const totalOOP = lastRow.totalCost;
+
+  return {
+    finalCashValue: lastRow.cashValue,
+    totalOutOfPocket: totalOOP,
+    finalNetDB: lastRow.netDB,
+    averageAnnualCost: totalOOP / data.length,
+  };
+}

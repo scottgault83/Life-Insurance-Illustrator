@@ -1,65 +1,118 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React, { useState, useMemo } from 'react';
+import { InputControls } from '@/components/InputControls';
+import { ResultsTable } from '@/components/ResultsTable';
+import { SummaryStats } from '@/components/SummaryStats';
+import { VisualizationCharts } from '@/components/VisualizationCharts';
+import { ScenarioManager } from '@/components/ScenarioManager';
+import { ComparisonScenarios } from '@/components/ComparisonScenarios';
+import { PDFExport } from '@/components/PDFExport';
+import { CalculatorInputs } from '@/lib/types';
+import { calculateInsuranceProjection } from '@/lib/calculator';
+
+const DEFAULT_INPUTS: CalculatorInputs = {
+  deathBenefit: 50000000,
+  rateOfReturn: 6.65,
+  borrowRate: 6.5,
+  outOfPocket: 700000,
+  paymentYears: 15,
+  premiumYears: 10,
+  annualPremium: 2400000,
+  firstYearFee: 10000,
+  startAge: 45,
+  initialExposure: 3044886,
+};
+
+const PremiumFinanceCalculator = () => {
+  const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
+  const [activeTab, setActiveTab] = useState<'calculator' | 'comparison'>('calculator');
+
+  const handleInputChange = <K extends keyof CalculatorInputs>(
+    key: K,
+    value: CalculatorInputs[K]
+  ) => {
+    setInputs(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleLoadScenario = (loadedInputs: CalculatorInputs) => {
+    setInputs(loadedInputs);
+  };
+
+  const calculationData = useMemo(() => {
+    return calculateInsuranceProjection(inputs);
+  }, [inputs]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="w-full min-h-screen bg-gray-50 p-6">
+      <div className="max-w-[1600px] mx-auto">
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            Premium Finance Illustration Calculator
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-gray-600">
+            Model your life insurance premium finance strategy with interactive scenarios and detailed projections
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {/* Tab Navigation */}
+        <div className="flex gap-2 mb-6 border-b border-gray-300">
+          <button
+            onClick={() => setActiveTab('calculator')}
+            className={`px-4 py-3 font-medium ${
+              activeTab === 'calculator'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Calculator
+          </button>
+          <button
+            onClick={() => setActiveTab('comparison')}
+            className={`px-4 py-3 font-medium ${
+              activeTab === 'comparison'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
           >
-            Documentation
-          </a>
+            Compare Scenarios
+          </button>
         </div>
-      </main>
+
+        {/* Main Content */}
+        {activeTab === 'calculator' ? (
+          <>
+            {/* Input Controls */}
+            <InputControls inputs={inputs} onInputChange={handleInputChange} />
+
+            {/* Action Buttons */}
+            <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex gap-2 flex-wrap">
+              <PDFExport data={calculationData} inputs={inputs} />
+            </div>
+
+            {/* Scenario Manager */}
+            <ScenarioManager currentInputs={inputs} onLoadScenario={handleLoadScenario} />
+
+            {/* Charts */}
+            <VisualizationCharts data={calculationData} />
+
+            {/* Summary Stats */}
+            <SummaryStats data={calculationData} />
+
+            {/* Results Table */}
+            <div className="mt-6">
+              <ResultsTable data={calculationData} />
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Comparison View */}
+            <ComparisonScenarios currentInputs={inputs} />
+          </>
+        )}
+      </div>
     </div>
   );
-}
+};
+
+export default PremiumFinanceCalculator;
