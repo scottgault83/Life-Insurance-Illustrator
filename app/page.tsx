@@ -2,19 +2,31 @@
 
 import React, { useState, useMemo } from 'react';
 import { InputControls } from '@/components/InputControls';
+import { YearlyRatesInput } from '@/components/YearlyRatesInput';
 import { ResultsTable } from '@/components/ResultsTable';
 import { SummaryStats } from '@/components/SummaryStats';
 import { VisualizationCharts } from '@/components/VisualizationCharts';
 import { ScenarioManager } from '@/components/ScenarioManager';
 import { ComparisonScenarios } from '@/components/ComparisonScenarios';
 import { PDFExport } from '@/components/PDFExport';
-import { CalculatorInputs } from '@/lib/types';
+import { CalculatorInputs, YearlyRate } from '@/lib/types';
 import { calculateInsuranceProjection } from '@/lib/calculator';
+
+// Initialize default yearly rates for 30 years
+const initializeYearlyRates = (): YearlyRate[] => {
+  const rates: YearlyRate[] = [];
+  for (let year = 1; year <= 30; year++) {
+    rates.push({
+      year,
+      rateOfReturn: 6.5,
+      borrowRate: 5.5,
+    });
+  }
+  return rates;
+};
 
 const DEFAULT_INPUTS: CalculatorInputs = {
   deathBenefit: 50000000,
-  rateOfReturn: 6.65,
-  borrowRate: 6.5,
   outOfPocket: 700000,
   paymentYears: 15,
   premiumYears: 10,
@@ -22,6 +34,7 @@ const DEFAULT_INPUTS: CalculatorInputs = {
   firstYearFee: 10000,
   startAge: 45,
   initialExposure: 3044886,
+  yearlyRates: initializeYearlyRates(),
 };
 
 const PremiumFinanceCalculator = () => {
@@ -37,6 +50,10 @@ const PremiumFinanceCalculator = () => {
 
   const handleLoadScenario = (loadedInputs: CalculatorInputs) => {
     setInputs(loadedInputs);
+  };
+
+  const handleYearlyRatesChange = (rates: YearlyRate[]) => {
+    setInputs(prev => ({ ...prev, yearlyRates: rates }));
   };
 
   const calculationData = useMemo(() => {
@@ -84,6 +101,13 @@ const PremiumFinanceCalculator = () => {
           <>
             {/* Input Controls */}
             <InputControls inputs={inputs} onInputChange={handleInputChange} />
+
+            {/* Yearly Rates Input */}
+            <YearlyRatesInput
+              rates={inputs.yearlyRates}
+              onRatesChange={handleYearlyRatesChange}
+              projectionYears={30}
+            />
 
             {/* Action Buttons */}
             <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex gap-2 flex-wrap">

@@ -1,7 +1,5 @@
 export interface CalculatorInputs {
   deathBenefit: number;
-  rateOfReturn: number;
-  borrowRate: number;
   outOfPocket: number;
   paymentYears: number;
   premiumYears: number;
@@ -9,6 +7,13 @@ export interface CalculatorInputs {
   firstYearFee: number;
   startAge: number;
   initialExposure: number;
+  yearlyRates: YearlyRate[];
+}
+
+export interface YearlyRate {
+  year: number;
+  rateOfReturn: number;
+  borrowRate: number;
 }
 
 export interface CalculationRow {
@@ -16,6 +21,8 @@ export interface CalculationRow {
   age: number;
   premium: number;
   fee: number;
+  rateOfReturn: number;
+  borrowRate: number;
   withdrawal: number;
   cashValue: number;
   db: number;

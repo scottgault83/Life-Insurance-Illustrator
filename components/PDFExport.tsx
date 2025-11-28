@@ -44,12 +44,12 @@ export const PDFExport: React.FC<PDFExportProps> = ({
                 <td style="padding: 8px; font-weight: bold;">${formatCurrency(inputs.deathBenefit)}</td>
               </tr>
               <tr style="border-bottom: 1px solid #ccc;">
-                <td style="padding: 8px;">Rate of Return:</td>
-                <td style="padding: 8px; font-weight: bold;">${formatPercent(inputs.rateOfReturn)}</td>
+                <td style="padding: 8px;">Initial Rate of Return (Year 1):</td>
+                <td style="padding: 8px; font-weight: bold;">${formatPercent(inputs.yearlyRates[0]?.rateOfReturn || 6.5)}</td>
               </tr>
               <tr style="border-bottom: 1px solid #ccc;">
-                <td style="padding: 8px;">Borrow Rate:</td>
-                <td style="padding: 8px; font-weight: bold;">${formatPercent(inputs.borrowRate)}</td>
+                <td style="padding: 8px;">Initial Borrow Rate (Year 1):</td>
+                <td style="padding: 8px; font-weight: bold;">${formatPercent(inputs.yearlyRates[0]?.borrowRate || 5.5)}</td>
               </tr>
               <tr style="border-bottom: 1px solid #ccc;">
                 <td style="padding: 8px;">Annual Out of Pocket:</td>

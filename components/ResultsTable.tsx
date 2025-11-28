@@ -17,6 +17,8 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ data }) => {
             <tr>
               <th className="px-3 py-3 text-left font-semibold">Year</th>
               <th className="px-3 py-3 text-left font-semibold bg-blue-500">Age</th>
+              <th className="px-3 py-3 text-right font-semibold text-sm">Rate of Return (%)</th>
+              <th className="px-3 py-3 text-right font-semibold text-sm">Borrow Rate (%)</th>
               <th className="px-3 py-3 text-right font-semibold">Premium</th>
               <th className="px-3 py-3 text-right font-semibold">Fee</th>
               <th className="px-3 py-3 text-right font-semibold">Withdrawal</th>
@@ -36,6 +38,8 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ data }) => {
               <tr key={row.year} className={idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                 <td className="px-3 py-2 border-b">{row.year}</td>
                 <td className="px-3 py-2 border-b bg-blue-50 font-medium">{row.age}</td>
+                <td className="px-3 py-2 border-b text-right text-sm">{row.rateOfReturn.toFixed(2)}%</td>
+                <td className="px-3 py-2 border-b text-right text-sm">{row.borrowRate.toFixed(2)}%</td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.premium)}</td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.fee)}</td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.withdrawal)}</td>

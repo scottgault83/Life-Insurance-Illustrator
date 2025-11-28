@@ -6,8 +6,6 @@ export function calculateInsuranceProjection(
 ): CalculationRow[] {
   const {
     deathBenefit,
-    rateOfReturn,
-    borrowRate,
     outOfPocket,
     paymentYears,
     premiumYears,
@@ -15,6 +13,7 @@ export function calculateInsuranceProjection(
     firstYearFee,
     startAge,
     initialExposure,
+    yearlyRates,
   } = inputs;
 
   const data: CalculationRow[] = [];
@@ -24,6 +23,11 @@ export function calculateInsuranceProjection(
 
   for (let year = 1; year <= years; year++) {
     const age = startAge + year - 1;
+
+    // Get year-specific rates
+    const yearRate = yearlyRates.find(r => r.year === year);
+    const rateOfReturn = yearRate?.rateOfReturn || 6.5;
+    const borrowRate = yearRate?.borrowRate || 5.5;
 
     // Premium calculation
     const premium = year <= premiumYears ? annualPremium : 0;
@@ -65,7 +69,7 @@ export function calculateInsuranceProjection(
     // Adjust cash value for withdrawal
     cashValue = cashValue - withdrawal;
 
-    // Death Benefit calculation
+    // Death Benefit calculation - use current year's rate for exposure growth
     const exposureGrowth = initialExposure * Math.pow(1 + rateOfReturn / 100, year - 1);
     const db = deathBenefit + exposureGrowth;
 
@@ -83,6 +87,8 @@ export function calculateInsuranceProjection(
       age,
       premium,
       fee,
+      rateOfReturn,
+      borrowRate,
       withdrawal,
       cashValue,
       db,
