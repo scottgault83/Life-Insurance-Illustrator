@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Download } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { CalculationRow, CalculatorInputs } from '@/lib/types';
 import { formatCurrency, formatPercent } from '@/lib/formatting';
+import { PDFCharts } from './PDFCharts';
 
 interface PDFExportProps {
   data: CalculationRow[];
@@ -18,6 +19,8 @@ export const PDFExport: React.FC<PDFExportProps> = ({
   inputs,
   fileName = 'insurance_illustration',
 }) => {
+  const chartsRef = useRef<HTMLDivElement>(null);
+
   const handleExportPDF = async () => {
     try {
       // Create a temporary container for PDF content
@@ -28,7 +31,7 @@ export const PDFExport: React.FC<PDFExportProps> = ({
       container.style.backgroundColor = 'white';
       document.body.appendChild(container);
 
-      // Create PDF header
+      // Create PDF header with data tables
       container.innerHTML = `
         <div style="padding: 20px; font-family: Arial, sans-serif;">
           <h1 style="text-align: center; margin-bottom: 20px;">Premium Finance Illustration</h1>
@@ -131,7 +134,7 @@ export const PDFExport: React.FC<PDFExportProps> = ({
         </div>
       `;
 
-      // Convert HTML to canvas and then to PDF
+      // Convert first page (data) to canvas and add to PDF
       const canvas = await html2canvas(container, {
         scale: 2,
         useCORS: true,
@@ -151,13 +154,37 @@ export const PDFExport: React.FC<PDFExportProps> = ({
 
       const imgData = canvas.toDataURL('image/png');
 
-      // Add image to PDF, creating new pages as needed
+      // Add data pages to PDF
       while (heightLeft >= 0) {
         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
         heightLeft -= 297; // A4 height
         if (heightLeft >= 0) {
           pdf.addPage();
           position = heightLeft - imgHeight;
+        }
+      }
+
+      // Add charts on new page
+      if (chartsRef.current) {
+        pdf.addPage();
+        const chartsCanvas = await html2canvas(chartsRef.current, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+        });
+
+        const chartsImgData = chartsCanvas.toDataURL('image/png');
+        const chartsImgHeight = (chartsCanvas.height * imgWidth) / chartsCanvas.width;
+        let chartsHeightLeft = chartsImgHeight;
+        let chartsPosition = 0;
+
+        while (chartsHeightLeft >= 0) {
+          pdf.addImage(chartsImgData, 'PNG', 0, chartsPosition, imgWidth, chartsImgHeight);
+          chartsHeightLeft -= 297;
+          if (chartsHeightLeft >= 0) {
+            pdf.addPage();
+            chartsPosition = chartsHeightLeft - chartsImgHeight;
+          }
         }
       }
 
@@ -172,12 +199,20 @@ export const PDFExport: React.FC<PDFExportProps> = ({
   };
 
   return (
-    <button
-      onClick={handleExportPDF}
-      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center gap-2"
-    >
-      <Download size={18} />
-      Export to PDF
-    </button>
+    <>
+      {/* Hidden charts container for PDF export */}
+      <div ref={chartsRef} style={{ display: 'none', padding: '20px', backgroundColor: 'white' }}>
+        <PDFCharts data={data} />
+      </div>
+
+      {/* PDF Export Button */}
+      <button
+        onClick={handleExportPDF}
+        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center gap-2"
+      >
+        <Download size={18} />
+        Export to PDF
+      </button>
+    </>
   );
 };

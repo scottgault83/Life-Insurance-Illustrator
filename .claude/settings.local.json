@@ -5,7 +5,10 @@
       "Bash(npm install:*)",
       "Bash(lsof:*)",
       "Bash(xargs kill:*)",
-      "Bash(vercel --prod:*)"
+      "Bash(vercel --prod:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)"
     ],
     "deny": [],
     "ask": []
