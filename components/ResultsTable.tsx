@@ -1,14 +1,15 @@
 'use client';
 
 import React from 'react';
-import { CalculationRow } from '@/lib/types';
+import { CalculationRow, YearlyRate } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatting';
 
 interface ResultsTableProps {
   data: CalculationRow[];
+  onRateChange?: (year: number, field: 'rateOfReturn' | 'borrowRate', value: number) => void;
 }
 
-export const ResultsTable: React.FC<ResultsTableProps> = ({ data }) => {
+export const ResultsTable: React.FC<ResultsTableProps> = ({ data, onRateChange }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="overflow-x-auto">
@@ -38,8 +39,26 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ data }) => {
               <tr key={row.year} className={idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                 <td className="px-3 py-2 border-b">{row.year}</td>
                 <td className="px-3 py-2 border-b bg-blue-50 font-medium">{row.age}</td>
-                <td className="px-3 py-2 border-b text-right text-sm">{row.rateOfReturn.toFixed(2)}%</td>
-                <td className="px-3 py-2 border-b text-right text-sm">{row.borrowRate.toFixed(2)}%</td>
+                <td className="px-3 py-2 border-b text-right">
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={row.rateOfReturn.toFixed(2)}
+                    onChange={(e) => onRateChange?.(row.year, 'rateOfReturn', Number(e.target.value))}
+                    className="w-16 px-2 py-1 border border-gray-300 rounded-md text-right text-sm focus:ring-2 focus:ring-blue-500"
+                  />
+                  %
+                </td>
+                <td className="px-3 py-2 border-b text-right">
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={row.borrowRate.toFixed(2)}
+                    onChange={(e) => onRateChange?.(row.year, 'borrowRate', Number(e.target.value))}
+                    className="w-16 px-2 py-1 border border-gray-300 rounded-md text-right text-sm focus:ring-2 focus:ring-blue-500"
+                  />
+                  %
+                </td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.premium)}</td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.fee)}</td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.withdrawal)}</td>

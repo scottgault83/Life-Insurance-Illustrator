@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo } from 'react';
 import { InputControls } from '@/components/InputControls';
-import { YearlyRatesInput } from '@/components/YearlyRatesInput';
 import { ResultsTable } from '@/components/ResultsTable';
 import { SummaryStats } from '@/components/SummaryStats';
 import { VisualizationCharts } from '@/components/VisualizationCharts';
@@ -56,6 +55,19 @@ const PremiumFinanceCalculator = () => {
     setInputs(prev => ({ ...prev, yearlyRates: rates }));
   };
 
+  const handleTableRateChange = (year: number, field: 'rateOfReturn' | 'borrowRate', value: number) => {
+    setInputs(prev => {
+      const updatedRates = [...prev.yearlyRates];
+      const index = updatedRates.findIndex(r => r.year === year);
+      if (index >= 0) {
+        updatedRates[index] = { ...updatedRates[index], [field]: value };
+      } else {
+        updatedRates.push({ year, rateOfReturn: 6.5, borrowRate: 5.5, [field]: value });
+      }
+      return { ...prev, yearlyRates: updatedRates };
+    });
+  };
+
   const calculationData = useMemo(() => {
     return calculateInsuranceProjection(inputs);
   }, [inputs]);
@@ -102,13 +114,6 @@ const PremiumFinanceCalculator = () => {
             {/* Input Controls */}
             <InputControls inputs={inputs} onInputChange={handleInputChange} />
 
-            {/* Yearly Rates Input */}
-            <YearlyRatesInput
-              rates={inputs.yearlyRates}
-              onRatesChange={handleYearlyRatesChange}
-              projectionYears={30}
-            />
-
             {/* Action Buttons */}
             <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex gap-2 flex-wrap">
               <PDFExport data={calculationData} inputs={inputs} />
@@ -125,7 +130,7 @@ const PremiumFinanceCalculator = () => {
 
             {/* Results Table */}
             <div className="mt-6">
-              <ResultsTable data={calculationData} />
+              <ResultsTable data={calculationData} onRateChange={handleTableRateChange} />
             </div>
           </>
         ) : (
