@@ -19,7 +19,7 @@ const columnFormulas: Record<string, string> = {
   'Withdrawal': 'If year = Payment Years and CV ≥ EOY Bal, withdrawal = EOY Bal, else $0',
   'Cash Value': 'Prev CV × (1 + Rate of Return%) + Premium - Fee (Y1 only) - Withdrawal',
   'DB': 'Death Benefit + (Initial Exposure × (1 + Rate of Return%)^(Year-1))',
-  'BOY BAL': 'If year = 1: Premium + Fee, else Prev EOY Bal + Premium',
+  'BOY BAL': 'If year = 1: Premium, else Prev EOY Bal + Premium (if applicable) - O of P',
   'EOY Interest': 'BOY BAL × (Borrow Rate% / 100)',
   'O of P': 'Annual Out of Pocket if year ≤ Payment Years, else $0',
   'EOY BAL': 'BOY BAL + max(0, EOY Interest - O of P)',
