@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { InputControls } from '@/components/InputControls';
 import { ResultsTable } from '@/components/ResultsTable';
 import { SummaryStats } from '@/components/SummaryStats';
@@ -8,6 +9,7 @@ import { VisualizationCharts } from '@/components/VisualizationCharts';
 import { ScenarioManager } from '@/components/ScenarioManager';
 import { ComparisonScenarios } from '@/components/ComparisonScenarios';
 import { PDFExport } from '@/components/PDFExport';
+import { SessionSaver } from '@/components/SessionSaver';
 import { CalculatorInputs, YearlyRate } from '@/lib/types';
 import { calculateInsuranceProjection } from '@/lib/calculator';
 
@@ -42,6 +44,28 @@ const DEFAULT_INPUTS: CalculatorInputs = {
 const PremiumFinanceCalculator = () => {
   const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
   const [activeTab, setActiveTab] = useState<'calculator' | 'comparison'>('calculator');
+  const [isInitialized, setIsInitialized] = useState(false);
+  const router = useRouter();
+
+  // Load session from session storage on mount
+  useEffect(() => {
+    const userId = sessionStorage.getItem('userId');
+    if (!userId) {
+      router.push('/login');
+      return;
+    }
+
+    const savedInputs = sessionStorage.getItem('calculatorInputs');
+    if (savedInputs) {
+      try {
+        const parsedInputs = JSON.parse(savedInputs);
+        setInputs(parsedInputs);
+      } catch (err) {
+        console.error('Failed to parse saved inputs:', err);
+      }
+    }
+    setIsInitialized(true);
+  }, [router]);
 
   const handleInputChange = <K extends keyof CalculatorInputs>(
     key: K,
@@ -114,6 +138,9 @@ const PremiumFinanceCalculator = () => {
         {/* Main Content */}
         {activeTab === 'calculator' ? (
           <>
+            {/* Session Saver */}
+            {isInitialized && <SessionSaver inputs={inputs} />}
+
             {/* Input Controls */}
             <InputControls inputs={inputs} onInputChange={handleInputChange} />
 
