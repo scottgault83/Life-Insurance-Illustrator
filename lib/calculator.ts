@@ -78,8 +78,9 @@ export function calculateInsuranceProjection(
     const exposureGrowth = initialExposure * Math.pow(1 + rateOfReturn / 100, year - 1);
     const db = deathBenefit + exposureGrowth;
 
-    // Net Death Benefit
-    const netDB = db - (withdrawal > 0 ? 0 : eoyBal);
+    // Net Death Benefit = Death Benefit - EOY Balance + Cash Value
+    // This represents the net benefit after accounting for debt and adding cash value
+    const netDB = db - (withdrawal > 0 ? 0 : eoyBal) + cashValue;
 
     // Collateral (simplified - could be more complex)
     const collateral = year <= paymentYears ? Math.max(0, eoyBal - cashValue * 0.9) : 0;
