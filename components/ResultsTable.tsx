@@ -9,29 +9,64 @@ interface ResultsTableProps {
   onRateChange?: (year: number, field: 'rateOfReturn' | 'borrowRate', value: number) => void;
 }
 
+const columnFormulas: Record<string, string> = {
+  'Year': 'Projection year number',
+  'Age': 'Start Age + Year - 1',
+  'Rate of Return (%)': 'Investment return rate (editable)',
+  'Borrow Rate (%)': 'Loan interest rate (editable)',
+  'Premium': 'Annual premium if year ≤ Premium Years, else $0',
+  'Fee': 'First Year Fee if year = 1, else $0',
+  'Withdrawal': 'If year = Payment Years and CV ≥ EOY Bal, withdrawal = EOY Bal, else $0',
+  'Cash Value': 'Prev CV × (1 + Rate of Return%) + Premium - Fee (Y1 only) - Withdrawal',
+  'DB': 'Death Benefit + (Initial Exposure × (1 + Rate of Return%)^(Year-1))',
+  'BOY BAL': 'If year = 1: Premium + Fee, else Prev EOY Bal + Premium',
+  'EOY Interest': 'BOY BAL × (Borrow Rate% / 100)',
+  'O of P': 'Annual Out of Pocket if year ≤ Payment Years, else $0',
+  'EOY BAL': 'BOY BAL + max(0, EOY Interest - O of P)',
+  'NET DB': 'DB - (Withdrawal > 0 ? 0 : EOY BAL) + Cash Value',
+  'Collateral': 'max(0, EOY BAL - Cash Value)',
+  'Total Cost': 'Cumulative sum of O of P + Fee',
+};
+
+const TooltipHeader = ({ title }: { title: string }) => {
+  const formula = columnFormulas[title];
+  return (
+    <div className="relative group cursor-help">
+      <span className="underline decoration-dotted">{title}</span>
+      {formula && (
+        <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-gray-900 text-white text-xs rounded-md p-2 w-48 z-10 whitespace-normal">
+          <p className="font-semibold mb-1">Formula:</p>
+          <p>{formula}</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const ResultsTable: React.FC<ResultsTableProps> = ({ data, onRateChange }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <p className="px-6 pt-4 text-xs text-gray-600">💡 Hover over column headers to see calculation formulas</p>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-blue-600 text-white">
             <tr>
-              <th className="px-3 py-3 text-left font-semibold">Year</th>
-              <th className="px-3 py-3 text-left font-semibold bg-blue-500">Age</th>
-              <th className="px-3 py-3 text-right font-semibold text-sm">Rate of Return (%)</th>
-              <th className="px-3 py-3 text-right font-semibold text-sm">Borrow Rate (%)</th>
-              <th className="px-3 py-3 text-right font-semibold">Premium</th>
-              <th className="px-3 py-3 text-right font-semibold">Fee</th>
-              <th className="px-3 py-3 text-right font-semibold">Withdrawal</th>
-              <th className="px-3 py-3 text-right font-semibold">Cash Value</th>
-              <th className="px-3 py-3 text-right font-semibold">DB</th>
-              <th className="px-3 py-3 text-right font-semibold">BOY BAL</th>
-              <th className="px-3 py-3 text-right font-semibold">EOY Interest</th>
-              <th className="px-3 py-3 text-right font-semibold bg-yellow-500">O of P</th>
-              <th className="px-3 py-3 text-right font-semibold">EOY BAL</th>
-              <th className="px-3 py-3 text-right font-semibold">NET DB</th>
-              <th className="px-3 py-3 text-right font-semibold">Collateral</th>
-              <th className="px-3 py-3 text-right font-semibold bg-green-500">Total Cost</th>
+              <th className="px-3 py-3 text-left font-semibold"><TooltipHeader title="Year" /></th>
+              <th className="px-3 py-3 text-left font-semibold bg-blue-500"><TooltipHeader title="Age" /></th>
+              <th className="px-3 py-3 text-right font-semibold text-sm"><TooltipHeader title="Rate of Return (%)" /></th>
+              <th className="px-3 py-3 text-right font-semibold text-sm"><TooltipHeader title="Borrow Rate (%)" /></th>
+              <th className="px-3 py-3 text-right font-semibold"><TooltipHeader title="Premium" /></th>
+              <th className="px-3 py-3 text-right font-semibold"><TooltipHeader title="Fee" /></th>
+              <th className="px-3 py-3 text-right font-semibold"><TooltipHeader title="Withdrawal" /></th>
+              <th className="px-3 py-3 text-right font-semibold"><TooltipHeader title="Cash Value" /></th>
+              <th className="px-3 py-3 text-right font-semibold"><TooltipHeader title="DB" /></th>
+              <th className="px-3 py-3 text-right font-semibold"><TooltipHeader title="BOY BAL" /></th>
+              <th className="px-3 py-3 text-right font-semibold"><TooltipHeader title="EOY Interest" /></th>
+              <th className="px-3 py-3 text-right font-semibold bg-yellow-500"><TooltipHeader title="O of P" /></th>
+              <th className="px-3 py-3 text-right font-semibold"><TooltipHeader title="EOY BAL" /></th>
+              <th className="px-3 py-3 text-right font-semibold"><TooltipHeader title="NET DB" /></th>
+              <th className="px-3 py-3 text-right font-semibold"><TooltipHeader title="Collateral" /></th>
+              <th className="px-3 py-3 text-right font-semibold bg-green-500"><TooltipHeader title="Total Cost" /></th>
             </tr>
           </thead>
           <tbody>
