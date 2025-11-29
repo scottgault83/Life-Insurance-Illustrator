@@ -26,6 +26,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
+    if (!data.user || !data.session) {
+      return NextResponse.json(
+        { error: 'Login failed - no user or session data returned' },
+        { status: 400 }
+      );
+    }
+
     const response = NextResponse.json(
       { user: data.user, session: data.session },
       { status: 200 }
@@ -43,8 +50,10 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
+    console.error('Login error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: `Internal server error: ${errorMessage}` },
       { status: 500 }
     );
   }
