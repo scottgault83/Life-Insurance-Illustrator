@@ -7,9 +7,6 @@ import { ResultsTable } from '@/components/ResultsTable';
 import { SummaryStats } from '@/components/SummaryStats';
 import { VisualizationCharts } from '@/components/VisualizationCharts';
 import { ScenarioManager } from '@/components/ScenarioManager';
-import { ComparisonScenarios } from '@/components/ComparisonScenarios';
-import { PDFExport } from '@/components/PDFExport';
-import { SessionSaver } from '@/components/SessionSaver';
 import { CalculatorInputs, YearlyRate } from '@/lib/types';
 import { calculateInsuranceProjection } from '@/lib/calculator';
 
@@ -43,7 +40,6 @@ const DEFAULT_INPUTS: CalculatorInputs = {
 
 const PremiumFinanceCalculator = () => {
   const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
-  const [activeTab, setActiveTab] = useState<'calculator' | 'comparison'>('calculator');
   const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
 
@@ -111,64 +107,24 @@ const PremiumFinanceCalculator = () => {
           </p>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6 border-b border-gray-300">
-          <button
-            onClick={() => setActiveTab('calculator')}
-            className={`px-4 py-3 font-medium ${
-              activeTab === 'calculator'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            Calculator
-          </button>
-          <button
-            onClick={() => setActiveTab('comparison')}
-            className={`px-4 py-3 font-medium ${
-              activeTab === 'comparison'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            Compare Scenarios
-          </button>
-        </div>
 
         {/* Main Content */}
-        {activeTab === 'calculator' ? (
-          <>
-            {/* Session Saver */}
-            {isInitialized && <SessionSaver inputs={inputs} />}
+        {/* Scenario Manager */}
+        <ScenarioManager currentInputs={inputs} onLoadScenario={handleLoadScenario} />
 
-            {/* Input Controls */}
-            <InputControls inputs={inputs} onInputChange={handleInputChange} />
+        {/* Input Controls */}
+        <InputControls inputs={inputs} onInputChange={handleInputChange} />
 
-            {/* Action Buttons */}
-            <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex gap-2 flex-wrap">
-              <PDFExport data={calculationData} inputs={inputs} />
-            </div>
+        {/* Charts */}
+        <VisualizationCharts data={calculationData} />
 
-            {/* Scenario Manager */}
-            <ScenarioManager currentInputs={inputs} onLoadScenario={handleLoadScenario} />
+        {/* Summary Stats */}
+        <SummaryStats data={calculationData} />
 
-            {/* Charts */}
-            <VisualizationCharts data={calculationData} />
-
-            {/* Summary Stats */}
-            <SummaryStats data={calculationData} />
-
-            {/* Results Table */}
-            <div className="mt-6">
-              <ResultsTable data={calculationData} onRateChange={handleTableRateChange} />
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Comparison View */}
-            <ComparisonScenarios currentInputs={inputs} />
-          </>
-        )}
+        {/* Results Table */}
+        <div className="mt-6">
+          <ResultsTable data={calculationData} onRateChange={handleTableRateChange} />
+        </div>
       </div>
     </div>
   );
