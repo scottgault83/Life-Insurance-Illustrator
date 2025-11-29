@@ -82,8 +82,8 @@ export function calculateInsuranceProjection(
     // This represents the net benefit after accounting for debt and adding cash value
     const netDB = db - (withdrawal > 0 ? 0 : eoyBal) + cashValue;
 
-    // Collateral (simplified - could be more complex)
-    const collateral = year <= paymentYears ? Math.max(0, eoyBal - cashValue * 0.9) : 0;
+    // Collateral = EOY Balance - Cash Value (minimum $0)
+    const collateral = Math.max(0, eoyBal - cashValue);
 
     // Total Cost
     totalCostAccum += oop + fee;
