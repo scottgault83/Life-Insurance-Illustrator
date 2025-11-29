@@ -56,7 +56,6 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ data, onRateChange }
               <th className="px-3 py-3 text-right font-semibold text-sm relative"><TooltipHeader title="Rate of Return (%)" /></th>
               <th className="px-3 py-3 text-right font-semibold text-sm relative"><TooltipHeader title="Borrow Rate (%)" /></th>
               <th className="px-3 py-3 text-right font-semibold relative"><TooltipHeader title="Premium" /></th>
-              <th className="px-3 py-3 text-right font-semibold relative"><TooltipHeader title="Fee" /></th>
               <th className="px-3 py-3 text-right font-semibold relative"><TooltipHeader title="Withdrawal" /></th>
               <th className="px-3 py-3 text-right font-semibold relative"><TooltipHeader title="Cash Value" /></th>
               <th className="px-3 py-3 text-right font-semibold relative"><TooltipHeader title="DB" /></th>
@@ -95,7 +94,6 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ data, onRateChange }
                   %
                 </td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.premium)}</td>
-                <td className="px-3 py-2 border-b text-right">{formatCurrency(row.fee)}</td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.withdrawal)}</td>
                 <td className="px-3 py-2 border-b text-right font-semibold text-blue-700">
                   {formatCurrency(row.cashValue)}
