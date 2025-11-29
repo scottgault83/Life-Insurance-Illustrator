@@ -60,6 +60,11 @@ export function calculateInsuranceProjection(
       cashValue = prevCashValue * (1 + rateOfReturn / 100);
     }
 
+    // Subtract First Year Fee from Year 1 Cash Value
+    if (year === 1) {
+      cashValue = cashValue - fee;
+    }
+
     // Withdrawal (payback to lender)
     let withdrawal = 0;
     if (year === paymentYears && cashValue >= eoyBal) {

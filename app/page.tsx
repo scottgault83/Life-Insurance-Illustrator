@@ -24,13 +24,16 @@ const initializeYearlyRates = (): YearlyRate[] => {
   return rates;
 };
 
+const ANNUAL_PREMIUM_DEFAULT = 2400000;
+const FIRST_YEAR_FEE_DEFAULT = ANNUAL_PREMIUM_DEFAULT * 0.8; // 80% of Annual Premium
+
 const DEFAULT_INPUTS: CalculatorInputs = {
   deathBenefit: 50000000,
   outOfPocket: 700000,
   paymentYears: 15,
   premiumYears: 10,
-  annualPremium: 2400000,
-  firstYearFee: 10000,
+  annualPremium: ANNUAL_PREMIUM_DEFAULT,
+  firstYearFee: FIRST_YEAR_FEE_DEFAULT,
   startAge: 45,
   initialExposure: 3044886,
   yearlyRates: initializeYearlyRates(),
