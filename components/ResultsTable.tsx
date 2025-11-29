@@ -25,7 +25,7 @@ const columnFormulas: Record<string, string> = {
   'EOY BAL': 'BOY BAL + EOY Interest',
   'NET DB': 'DB - (Withdrawal > 0 ? 0 : EOY BAL) + Cash Value',
   'Collateral': 'max(0, EOY BAL - Cash Value)',
-  'Total Cost': 'Cumulative sum of O of P + Fee',
+  'Total Cost': 'Cumulative sum of O of P (excludes Fee)',
 };
 
 const TooltipHeader = ({ title }: { title: string }) => {

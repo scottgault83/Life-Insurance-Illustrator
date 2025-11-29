@@ -19,7 +19,7 @@ export function calculateInsuranceProjection(
   const data: CalculationRow[] = [];
   let prevCashValue = 0;
   let prevEOYBal = 0;
-  let totalCostAccum = firstYearFee;
+  let totalCostAccum = 0;
 
   for (let year = 1; year <= years; year++) {
     const age = startAge + year - 1;
@@ -86,8 +86,8 @@ export function calculateInsuranceProjection(
     // Collateral = EOY Balance - Cash Value (minimum $0)
     const collateral = Math.max(0, eoyBal - cashValue);
 
-    // Total Cost
-    totalCostAccum += oop + fee;
+    // Total Cost (Out of Pocket only, excluding fee)
+    totalCostAccum += oop;
 
     data.push({
       year,
