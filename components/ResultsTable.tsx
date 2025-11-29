@@ -24,7 +24,7 @@ const columnFormulas: Record<string, string> = {
   'O of P': 'Annual Out of Pocket if year ≤ Payment Years, else $0',
   'EOY BAL': 'BOY BAL + EOY Interest',
   'NET DB': 'DB - (Withdrawal > 0 ? 0 : EOY BAL) + Cash Value',
-  'Collateral': 'max(0, EOY BAL - Cash Value)',
+  'Collateral': 'If withdrawal occurs: $0, else max(0, EOY BAL - Cash Value)',
   'Total Cost': 'Cumulative sum of O of P (excludes Fee)',
 };
 

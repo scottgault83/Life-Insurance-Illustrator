@@ -84,7 +84,8 @@ export function calculateInsuranceProjection(
     const netDB = db - (withdrawal > 0 ? 0 : eoyBal) + cashValue;
 
     // Collateral = EOY Balance - Cash Value (minimum $0)
-    const collateral = Math.max(0, eoyBal - cashValue);
+    // After withdrawal, collateral should be $0
+    const collateral = withdrawal > 0 ? 0 : Math.max(0, eoyBal - cashValue);
 
     // Total Cost (Out of Pocket only, excluding fee)
     totalCostAccum += oop;
