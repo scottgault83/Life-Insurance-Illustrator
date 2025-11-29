@@ -39,18 +39,17 @@ export function calculateInsuranceProjection(
     const oop = year <= paymentYears ? outOfPocket : 0;
 
     // BOY Balance (Beginning of Year Balance)
-    // Year 1: Premium only (no fee included)
+    // Year 1: Premium - Out of Pocket
     // Subsequent years: Previous EOY Balance + Premium (if applicable) - Out of Pocket
-    const boyBal = year === 1 ? premium : prevEOYBal + (year <= premiumYears ? premium : 0) - oop;
+    const boyBal = year === 1
+      ? premium - oop
+      : prevEOYBal + (year <= premiumYears ? premium : 0) - oop;
 
-    // Interest charge
+    // Interest charge on BOY Balance
     const interestCharge = boyBal * (borrowRate / 100);
 
-    // Capitalized interest
-    const capitalizedInterest = Math.max(0, interestCharge - oop);
-
-    // EOY Balance
-    const eoyBal = boyBal + capitalizedInterest;
+    // EOY Balance = BOY Balance + Interest Charge
+    const eoyBal = boyBal + interestCharge;
 
     // Cash Value calculation
     let cashValue;
