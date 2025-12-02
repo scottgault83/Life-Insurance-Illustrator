@@ -42,14 +42,20 @@ const DEFAULT_INPUTS: CalculatorInputs = {
 const PremiumFinanceCalculator = () => {
   const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
   const router = useRouter();
 
   // Load session from session storage on mount
   useEffect(() => {
     const userId = sessionStorage.getItem('userId');
+    const email = sessionStorage.getItem('userEmail');
     if (!userId) {
       router.push('/login');
       return;
+    }
+
+    if (email) {
+      setUserEmail(email);
     }
 
     const savedInputs = sessionStorage.getItem('calculatorInputs');
@@ -103,6 +109,9 @@ const PremiumFinanceCalculator = () => {
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
             Premium Finance Illustration Calculator
           </h1>
+          <p className="text-gray-600 mb-4">
+            Welcome <span className="font-semibold">{userEmail}</span> to your session of <span className="font-bold">Premium Finance Illustration Calculator</span>
+          </p>
           <p className="text-gray-600">
             Model your life insurance premium finance strategy with interactive scenarios and detailed projections
           </p>
