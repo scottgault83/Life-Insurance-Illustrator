@@ -7,6 +7,7 @@ import { ResultsTable } from '@/components/ResultsTable';
 import { SummaryStats } from '@/components/SummaryStats';
 import { VisualizationCharts } from '@/components/VisualizationCharts';
 import { ScenarioManager } from '@/components/ScenarioManager';
+import { SessionSaver } from '@/components/SessionSaver';
 import { CalculatorInputs, YearlyRate } from '@/lib/types';
 import { calculateInsuranceProjection } from '@/lib/calculator';
 
@@ -111,6 +112,9 @@ const PremiumFinanceCalculator = () => {
         {/* Main Content */}
         {/* Scenario Manager */}
         <ScenarioManager currentInputs={inputs} onLoadScenario={handleLoadScenario} />
+
+        {/* Session Saver */}
+        {isInitialized && <SessionSaver inputs={inputs} />}
 
         {/* Input Controls */}
         <InputControls inputs={inputs} onInputChange={handleInputChange} />
