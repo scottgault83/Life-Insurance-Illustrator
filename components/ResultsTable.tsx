@@ -130,7 +130,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                   />
                 </td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.eoyBal)}</td>
-                <td className="px-3 py-2 border-b text-right font-semibold text-green-700">
+                <td className="px-3 py-2 border-b text-right">
                   {formatCurrency(row.netDB)}
                 </td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.collateral)}</td>
