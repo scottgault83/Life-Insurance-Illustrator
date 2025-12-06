@@ -123,22 +123,101 @@ const PremiumFinanceCalculator = () => {
   const hasCustomOop = Object.keys(customOopValues).length > 0;
 
   const calculationData = useMemo(() => {
-    const baseData = calculateInsuranceProjection(inputs);
-    // Apply custom O of P values to the calculation results
-    return baseData.map(row => {
-      if (customOopValues[row.year] !== undefined) {
-        const customOop = customOopValues[row.year];
-        const oopDifference = customOop - row.oop;
-        return {
-          ...row,
-          oop: customOop,
-          boyBal: row.boyBal + oopDifference,
-          eoyBal: row.eoyBal + oopDifference,
-          totalCost: row.totalCost + oopDifference,
-        };
+    // If no custom O of P values, just use base calculation
+    if (Object.keys(customOopValues).length === 0) {
+      return calculateInsuranceProjection(inputs);
+    }
+
+    // Calculate with custom O of P values - need to recalculate to cascade changes
+    const {
+      deathBenefit,
+      outOfPocket,
+      paymentYears,
+      premiumYears,
+      annualPremium,
+      firstYearFee,
+      startAge,
+      initialExposure,
+      yearlyRates,
+    } = inputs;
+
+    const data: any[] = [];
+    let prevCashValue = 0;
+    let prevEOYBal = 0;
+    let totalCostAccum = 0;
+
+    for (let year = 1; year <= 30; year++) {
+      const age = startAge + year - 1;
+
+      const yearRate = yearlyRates.find(r => r.year === year);
+      const rateOfReturn = yearRate?.rateOfReturn || 6.5;
+      const borrowRate = yearRate?.borrowRate || 5.5;
+
+      const premium = year <= premiumYears ? annualPremium : 0;
+      const fee = year === 1 ? firstYearFee : 0;
+
+      // Use custom O of P if set, otherwise use default
+      const oop = customOopValues[year] !== undefined
+        ? customOopValues[year]
+        : (year <= paymentYears ? outOfPocket : 0);
+
+      // BOY Balance with custom O of P
+      const boyBal = year === 1
+        ? premium - oop
+        : prevEOYBal + (year <= premiumYears ? premium : 0) - oop;
+
+      const interestCharge = boyBal * (borrowRate / 100);
+      const eoyBal = boyBal + interestCharge;
+
+      let cashValue;
+      if (year <= premiumYears) {
+        cashValue = prevCashValue * (1 + rateOfReturn / 100) + premium;
+      } else {
+        cashValue = prevCashValue * (1 + rateOfReturn / 100);
       }
-      return row;
-    });
+
+      if (year === 1) {
+        cashValue = cashValue - fee;
+      }
+
+      let withdrawal = 0;
+      if (year === paymentYears && cashValue >= eoyBal) {
+        withdrawal = eoyBal;
+      }
+
+      cashValue = cashValue - withdrawal;
+
+      const exposureGrowth = initialExposure * Math.pow(1 + rateOfReturn / 100, year - 1);
+      const db = deathBenefit + exposureGrowth;
+      const netDB = db - (withdrawal > 0 ? 0 : eoyBal) + cashValue;
+      const collateral = withdrawal > 0 ? 0 : Math.max(0, eoyBal - cashValue);
+
+      totalCostAccum += oop;
+
+      data.push({
+        year,
+        age,
+        premium,
+        fee,
+        rateOfReturn,
+        borrowRate,
+        withdrawal,
+        cashValue,
+        db,
+        boyBal,
+        interestCharge,
+        oop,
+        eoyBal: withdrawal > 0 ? 0 : eoyBal,
+        netDB,
+        collateral,
+        totalCost: totalCostAccum,
+      });
+
+      prevCashValue = cashValue;
+      prevEOYBal = withdrawal > 0 ? 0 : eoyBal;
+    }
+
+    return data;
   }, [inputs, customOopValues]);
 
   return (
