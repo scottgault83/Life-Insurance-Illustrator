@@ -7,6 +7,7 @@ import { formatCurrency } from '@/lib/formatting';
 interface ResultsTableProps {
   data: CalculationRow[];
   onRateChange?: (year: number, field: 'rateOfReturn' | 'borrowRate', value: number) => void;
+  onOopChange?: (year: number, value: number) => void;
 }
 
 const columnFormulas: Record<string, string> = {
@@ -43,7 +44,7 @@ const TooltipHeader = ({ title }: { title: string }) => {
   );
 };
 
-export const ResultsTable: React.FC<ResultsTableProps> = ({ data, onRateChange }) => {
+export const ResultsTable: React.FC<ResultsTableProps> = ({ data, onRateChange, onOopChange }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <p className="px-6 pt-4 text-xs text-gray-600">💡 Hover over column headers to see calculation formulas</p>
@@ -102,7 +103,12 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ data, onRateChange }
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.boyBal)}</td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.interestCharge)}</td>
                 <td className="px-3 py-2 border-b text-right bg-yellow-50 font-medium">
-                  {formatCurrency(row.oop)}
+                  <input
+                    type="number"
+                    value={row.oop}
+                    onChange={(e) => onOopChange?.(row.year, Number(e.target.value))}
+                    className="w-24 px-2 py-1 border border-gray-300 rounded-md text-right text-sm focus:ring-2 focus:ring-blue-500"
+                  />
                 </td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.eoyBal)}</td>
                 <td className="px-3 py-2 border-b text-right font-semibold text-green-700">

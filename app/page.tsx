@@ -43,6 +43,7 @@ const PremiumFinanceCalculator = () => {
   const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
   const [isInitialized, setIsInitialized] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  const [customOopValues, setCustomOopValues] = useState<Record<number, number>>({});
   const router = useRouter();
 
   // Load session from session storage on mount
@@ -105,9 +106,40 @@ const PremiumFinanceCalculator = () => {
     });
   };
 
+  const handleOopChange = (year: number, value: number) => {
+    setCustomOopValues(prev => {
+      const updated = { ...prev };
+      if (value === inputs.outOfPocket) {
+        // If value matches default, remove from custom values
+        delete updated[year];
+      } else {
+        // Otherwise store custom value
+        updated[year] = value;
+      }
+      return updated;
+    });
+  };
+
+  const hasCustomOop = Object.keys(customOopValues).length > 0;
+
   const calculationData = useMemo(() => {
-    return calculateInsuranceProjection(inputs);
-  }, [inputs]);
+    const baseData = calculateInsuranceProjection(inputs);
+    // Apply custom O of P values to the calculation results
+    return baseData.map(row => {
+      if (customOopValues[row.year] !== undefined) {
+        const customOop = customOopValues[row.year];
+        const oopDifference = customOop - row.oop;
+        return {
+          ...row,
+          oop: customOop,
+          boyBal: row.boyBal + oopDifference,
+          eoyBal: row.eoyBal + oopDifference,
+          totalCost: row.totalCost + oopDifference,
+        };
+      }
+      return row;
+    });
+  }, [inputs, customOopValues]);
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-6">
@@ -133,7 +165,7 @@ const PremiumFinanceCalculator = () => {
         {isInitialized && <SessionSaver inputs={inputs} />}
 
         {/* Input Controls */}
-        <InputControls inputs={inputs} onInputChange={handleInputChange} />
+        <InputControls inputs={inputs} onInputChange={handleInputChange} hasCustomOop={hasCustomOop} />
 
         {/* Charts */}
         <VisualizationCharts data={calculationData} />
@@ -143,7 +175,7 @@ const PremiumFinanceCalculator = () => {
 
         {/* Results Table */}
         <div className="mt-6">
-          <ResultsTable data={calculationData} onRateChange={handleTableRateChange} />
+          <ResultsTable data={calculationData} onRateChange={handleTableRateChange} onOopChange={handleOopChange} />
         </div>
       </div>
     </div>

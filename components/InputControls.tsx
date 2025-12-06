@@ -6,6 +6,7 @@ import { CalculatorInputs } from '@/lib/types';
 interface InputControlsProps {
   inputs: CalculatorInputs;
   onInputChange: <K extends keyof CalculatorInputs>(key: K, value: CalculatorInputs[K]) => void;
+  hasCustomOop?: boolean;
 }
 
 const INPUT_FIELDS: Array<{
@@ -22,7 +23,7 @@ const INPUT_FIELDS: Array<{
   { key: 'initialExposure', label: 'Initial Exposure' },
 ];
 
-export const InputControls: React.FC<InputControlsProps> = ({ inputs, onInputChange }) => {
+export const InputControls: React.FC<InputControlsProps> = ({ inputs, onInputChange, hasCustomOop }) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
       <h2 className="text-xl font-semibold mb-4 text-gray-700">Adjustable Parameters</h2>
@@ -34,9 +35,12 @@ export const InputControls: React.FC<InputControlsProps> = ({ inputs, onInputCha
             return null;
           }
 
+          const isOopField = field.key === 'outOfPocket';
+          const labelColor = isOopField && hasCustomOop ? 'text-gray-400' : 'text-gray-700';
+
           return (
             <div key={field.key}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className={`block text-sm font-medium ${labelColor} mb-1`}>
                 {field.label}
               </label>
               <input
