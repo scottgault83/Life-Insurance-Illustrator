@@ -18,7 +18,6 @@ const INPUT_FIELDS: Array<{
   { key: 'paymentYears', label: 'Payment Years' },
   { key: 'annualPremium', label: 'Annual Premium' },
   { key: 'premiumYears', label: 'Premium Years' },
-  { key: 'firstYearFee', label: 'First Year Fee' },
   { key: 'startAge', label: 'Start Age' },
   { key: 'initialExposure', label: 'Initial Exposure' },
 ];

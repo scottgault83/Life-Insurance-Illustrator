@@ -74,7 +74,14 @@ const PremiumFinanceCalculator = () => {
     key: K,
     value: CalculatorInputs[K]
   ) => {
-    setInputs(prev => ({ ...prev, [key]: value }));
+    setInputs(prev => {
+      const updated = { ...prev, [key]: value };
+      // Automatically set firstYearFee to 80% of annualPremium
+      if (key === 'annualPremium') {
+        updated.firstYearFee = (value as number) * 0.8;
+      }
+      return updated;
+    });
   };
 
   const handleLoadScenario = (loadedInputs: CalculatorInputs) => {
