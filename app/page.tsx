@@ -183,9 +183,9 @@ const PremiumFinanceCalculator = () => {
 
       // Determine withdrawal: either from selected year or from default payment year
       let withdrawal = 0;
-      if (selectedWithdrawalYear === year && prevEOYBal > 0) {
-        // User selected this year - withdraw the previous year's EOY balance
-        withdrawal = prevEOYBal;
+      if (selectedWithdrawalYear === year && boyBal > 0) {
+        // User selected this year - withdraw the BOY balance to pay it down to $0
+        withdrawal = boyBal;
       } else if (selectedWithdrawalYear === null && year === paymentYears && cashValue >= eoyBal) {
         // Default behavior: withdraw at payment year if no selection and cash value is sufficient
         withdrawal = eoyBal;
