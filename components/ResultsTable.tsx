@@ -93,7 +93,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                   />
                   %
                 </td>
-                <td className={`px-3 py-2 border-b text-right ${row.borrowRate < row.rateOfReturn ? 'bg-red-100' : ''}`}>
+                <td className="px-3 py-2 border-b text-right">
                   <input
                     type="number"
                     step="0.1"
