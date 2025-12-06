@@ -24,7 +24,7 @@ const initializeYearlyRates = (): YearlyRate[] => {
   return rates;
 };
 
-const ANNUAL_PREMIUM_DEFAULT = 2400000;
+const ANNUAL_PREMIUM_DEFAULT = 3476497;
 const FIRST_YEAR_FEE_DEFAULT = ANNUAL_PREMIUM_DEFAULT * 0.8; // 80% of Annual Premium
 
 const DEFAULT_INPUTS: CalculatorInputs = {
