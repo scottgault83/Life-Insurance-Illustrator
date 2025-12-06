@@ -28,10 +28,11 @@ export const SessionSaver: React.FC<SessionSaverProps> = ({ inputs, onSessionSav
 
     try {
       const userId = sessionStorage.getItem('userId');
+      const userEmail = sessionStorage.getItem('userEmail');
       const currentSessionId = sessionStorage.getItem('currentSessionId');
 
-      if (!userId) {
-        setError('User ID not found. Please log in again.');
+      if (!userId || !userEmail) {
+        setError('User information not found. Please log in again.');
         return;
       }
 
@@ -46,6 +47,7 @@ export const SessionSaver: React.FC<SessionSaverProps> = ({ inputs, onSessionSav
           body: JSON.stringify({
             sessionId: currentSessionId,
             inputData: inputs,
+            userEmail,
           }),
         });
       } else {
@@ -59,6 +61,7 @@ export const SessionSaver: React.FC<SessionSaverProps> = ({ inputs, onSessionSav
             userId,
             sessionName,
             inputData: inputs,
+            userEmail,
           }),
         });
       }

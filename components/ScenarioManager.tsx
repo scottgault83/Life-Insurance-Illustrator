@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Save, Trash2, Copy } from 'lucide-react';
+import { Trash2, Copy } from 'lucide-react';
 import { CalculatorInputs, Scenario } from '@/lib/types';
-import { saveScenario, getAllScenarios, deleteScenario, getScenario } from '@/lib/storage';
+import { getAllScenarios, deleteScenario, getScenario } from '@/lib/storage';
 
 interface ScenarioManagerProps {
   currentInputs: CalculatorInputs;
@@ -15,21 +15,10 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
   onLoadScenario,
 }) => {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
-  const [showSaveForm, setShowSaveForm] = useState(false);
-  const [scenarioName, setScenarioName] = useState('');
 
   useEffect(() => {
     setScenarios(getAllScenarios());
   }, []);
-
-  const handleSaveScenario = () => {
-    if (scenarioName.trim()) {
-      const newScenario = saveScenario(scenarioName, currentInputs);
-      setScenarios([...scenarios, newScenario]);
-      setScenarioName('');
-      setShowSaveForm(false);
-    }
-  };
 
   const handleDeleteScenario = (id: string) => {
     if (deleteScenario(id)) {
@@ -55,41 +44,6 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
       <h2 className="text-xl font-semibold mb-4 text-gray-700">Scenario Manager</h2>
-
-      {/* Save Form */}
-      {showSaveForm ? (
-        <div className="mb-4 flex gap-2">
-          <input
-            type="text"
-            placeholder="Enter scenario name..."
-            value={scenarioName}
-            onChange={e => setScenarioName(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-            onKeyPress={e => e.key === 'Enter' && handleSaveScenario()}
-          />
-          <button
-            onClick={handleSaveScenario}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
-          >
-            <Save size={18} />
-            Save
-          </button>
-          <button
-            onClick={() => setShowSaveForm(false)}
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-          >
-            Cancel
-          </button>
-        </div>
-      ) : (
-        <button
-          onClick={() => setShowSaveForm(true)}
-          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
-        >
-          <Save size={18} />
-          Save Current Scenario
-        </button>
-      )}
 
       {/* Scenarios List */}
       {scenarios.length > 0 ? (
@@ -131,7 +85,7 @@ export const ScenarioManager: React.FC<ScenarioManagerProps> = ({
           ))}
         </div>
       ) : (
-        <p className="text-gray-500">No scenarios saved yet. Save your first scenario above.</p>
+        <p className="text-gray-500">No scenarios saved yet.</p>
       )}
     </div>
   );

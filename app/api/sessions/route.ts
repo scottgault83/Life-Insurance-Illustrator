@@ -4,19 +4,21 @@ import { CalculatorInputs } from '@/lib/types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, sessionName, inputData } = await req.json();
+    const { userId, sessionName, inputData, userEmail } = await req.json();
 
-    if (!userId || !sessionName || !inputData) {
+    if (!userId || !sessionName || !inputData || !userEmail) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    // Use service role key to bypass RLS for server-side operations
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { data, error } = await supabase
       .from('calculator_sessions')
@@ -76,16 +78,17 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const { sessionId, inputData } = await req.json();
+    const { sessionId, inputData, userEmail } = await req.json();
 
-    if (!sessionId || !inputData) {
+    if (!sessionId || !inputData || !userEmail) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    // Use service role key to bypass RLS for server-side operations
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { data, error } = await supabase
       .from('calculator_sessions')
