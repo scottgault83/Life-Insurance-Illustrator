@@ -8,6 +8,8 @@ interface ResultsTableProps {
   data: CalculationRow[];
   onRateChange?: (year: number, field: 'rateOfReturn' | 'borrowRate', value: number) => void;
   onOopChange?: (year: number, value: number) => void;
+  selectedWithdrawalYear?: number | null;
+  onWithdrawalYearChange?: (year: number | null) => void;
 }
 
 const columnFormulas: Record<string, string> = {
@@ -44,7 +46,13 @@ const TooltipHeader = ({ title }: { title: string }) => {
   );
 };
 
-export const ResultsTable: React.FC<ResultsTableProps> = ({ data, onRateChange, onOopChange }) => {
+export const ResultsTable: React.FC<ResultsTableProps> = ({
+  data,
+  onRateChange,
+  onOopChange,
+  selectedWithdrawalYear,
+  onWithdrawalYearChange,
+}) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <p className="px-6 pt-4 text-xs text-gray-600">💡 Hover over column headers to see calculation formulas</p>
@@ -57,6 +65,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ data, onRateChange, 
               <th className="px-3 py-3 text-right font-semibold text-sm relative"><TooltipHeader title="Rate of Return (%)" /></th>
               <th className="px-3 py-3 text-right font-semibold text-sm relative"><TooltipHeader title="Borrow Rate (%)" /></th>
               <th className="px-3 py-3 text-right font-semibold relative"><TooltipHeader title="Premium" /></th>
+              <th className="px-3 py-3 text-center font-semibold relative">Withdraw?</th>
               <th className="px-3 py-3 text-right font-semibold relative"><TooltipHeader title="Withdrawal" /></th>
               <th className="px-3 py-3 text-right font-semibold relative"><TooltipHeader title="Cash Value" /></th>
               <th className="px-3 py-3 text-right font-semibold relative"><TooltipHeader title="DB" /></th>
@@ -95,6 +104,16 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ data, onRateChange, 
                   %
                 </td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.premium)}</td>
+                <td className="px-3 py-2 border-b text-center">
+                  <input
+                    type="radio"
+                    name="withdrawalYear"
+                    checked={selectedWithdrawalYear === row.year}
+                    onChange={() => onWithdrawalYearChange?.(selectedWithdrawalYear === row.year ? null : row.year)}
+                    disabled={row.collateral > 0}
+                    className="cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                </td>
                 <td className="px-3 py-2 border-b text-right">{formatCurrency(row.withdrawal)}</td>
                 <td className="px-3 py-2 border-b text-right font-semibold text-blue-700">
                   {formatCurrency(row.cashValue)}

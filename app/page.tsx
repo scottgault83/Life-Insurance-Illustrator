@@ -44,6 +44,7 @@ const PremiumFinanceCalculator = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [customOopValues, setCustomOopValues] = useState<Record<number, number>>({});
+  const [selectedWithdrawalYear, setSelectedWithdrawalYear] = useState<number | null>(null);
   const router = useRouter();
 
   // Load session from session storage on mount
@@ -180,8 +181,13 @@ const PremiumFinanceCalculator = () => {
         cashValue = cashValue - fee;
       }
 
+      // Determine withdrawal: either from selected year or from default payment year
       let withdrawal = 0;
-      if (year === paymentYears && cashValue >= eoyBal) {
+      if (selectedWithdrawalYear === year && prevEOYBal > 0) {
+        // User selected this year - withdraw the previous year's EOY balance
+        withdrawal = prevEOYBal;
+      } else if (selectedWithdrawalYear === null && year === paymentYears && cashValue >= eoyBal) {
+        // Default behavior: withdraw at payment year if no selection and cash value is sufficient
         withdrawal = eoyBal;
       }
 
@@ -218,7 +224,7 @@ const PremiumFinanceCalculator = () => {
     }
 
     return data;
-  }, [inputs, customOopValues]);
+  }, [inputs, customOopValues, selectedWithdrawalYear]);
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-6">
@@ -254,7 +260,13 @@ const PremiumFinanceCalculator = () => {
 
         {/* Results Table */}
         <div className="mt-6">
-          <ResultsTable data={calculationData} onRateChange={handleTableRateChange} onOopChange={handleOopChange} />
+          <ResultsTable
+            data={calculationData}
+            onRateChange={handleTableRateChange}
+            onOopChange={handleOopChange}
+            selectedWithdrawalYear={selectedWithdrawalYear}
+            onWithdrawalYearChange={setSelectedWithdrawalYear}
+          />
         </div>
       </div>
     </div>
