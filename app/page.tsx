@@ -124,8 +124,8 @@ const PremiumFinanceCalculator = () => {
   const hasCustomOop = Object.keys(customOopValues).length > 0;
 
   const calculationData = useMemo(() => {
-    // If no custom O of P values, just use base calculation
-    if (Object.keys(customOopValues).length === 0) {
+    // If no custom O of P values and no withdrawal year selected, use base calculation
+    if (Object.keys(customOopValues).length === 0 && selectedWithdrawalYear === null) {
       return calculateInsuranceProjection(inputs);
     }
 
