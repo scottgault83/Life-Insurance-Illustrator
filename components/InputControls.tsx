@@ -37,6 +37,7 @@ export const InputControls: React.FC<InputControlsProps> = ({ inputs, onInputCha
 
           const isOopField = field.key === 'outOfPocket';
           const labelColor = isOopField && hasCustomOop ? 'text-gray-400' : 'text-gray-700';
+          const inputTextColor = isOopField && hasCustomOop ? 'text-gray-400' : 'text-gray-900';
 
           return (
             <div key={field.key}>
@@ -48,7 +49,7 @@ export const InputControls: React.FC<InputControlsProps> = ({ inputs, onInputCha
                 step={field.step || 1}
                 value={value}
                 onChange={e => onInputChange(field.key, Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 ${inputTextColor}`}
               />
             </div>
           );
