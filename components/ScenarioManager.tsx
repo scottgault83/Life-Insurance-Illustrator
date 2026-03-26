@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, Copy } from 'lucide-react';
 import { CalculatorInputs, Scenario } from '@/lib/types';
-import { getAllScenarios, deleteScenario, getScenario } from '@/lib/storage';
+import { getAllScenarios, deleteScenario, getScenario, saveScenario } from '@/lib/storage';
 
 interface ScenarioManagerProps {
   currentInputs: CalculatorInputs;
